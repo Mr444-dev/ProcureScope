@@ -43,7 +43,16 @@ zaobserwowanie.
 | source_hash | SHA-256 kanonicznej reprezentacji obiektu wyniku |
 | source_payload | Pełny pojedynczy obiekt z odpowiedzi Search API |
 | ingestion_run_id | Ostatni przebieg ładujący wersję |
-| first_seen_at, last_seen_at, updated_at | Znaczniki obserwacji/aktualizacji w UTC |
+| first_seen_at | Pierwsze zaobserwowanie wersji w UTC |
+| last_seen_at | Ostatnie ponowne pobranie wersji z TED w UTC |
+| source_changed_at | Ostatnia zmiana kanonicznej treści źródłowej w UTC |
+| updated_at | Ostatnia aktualizacja wiersza w bazie w UTC |
+
+W kolumnach `title` i `buyer_name` parser preferuje polski, a następnie angielski
+wariant językowy. `deadline` jest najwcześniejszą parsowalną datą z dostępnej listy;
+pełna tablica terminów i wartości źródłowe są zachowane w `source_payload`.
+Przy migracji starszej bazy `source_changed_at` dostaje wartość `first_seen_at`,
+ponieważ wcześniejsza historia zmian treści nie była rejestrowana.
 
 ## public.rejected_records
 
@@ -59,6 +68,7 @@ identyfikatora lub typ innego błędu.
 | fct_it_opportunities | Jedna wersja ogłoszenia z CPV zaczynającym się od 72 |
 | dim_buyer | Para nazwa zamawiającego + kraj, identyfikator wyłącznie raportowy |
 | mart_buyer_activity | Liczba wersji ogłoszeń IT według zamawiającego i miesiąca |
+| mart_upcoming_deadlines | Ogłoszenia IT z terminem dziś lub w przyszłości i liczbą dni do terminu |
 | mart_award_notice_coverage | Ogłoszenia z polami wynikowymi wraz z surowym JSON |
 | mart_data_coverage | Liczba i odsetek rekordów z dostępnymi kluczowymi polami |
 

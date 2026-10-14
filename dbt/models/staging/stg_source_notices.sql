@@ -18,5 +18,6 @@ select
     ingestion_run_id,
     first_seen_at,
     last_seen_at,
+    source_changed_at,
     updated_at
 from {{ source('procurescope', 'source_notice_versions') }}

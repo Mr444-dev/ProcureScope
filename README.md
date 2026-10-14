@@ -15,7 +15,7 @@ uruchamia codzienny przyrost, a Metabase udostępnia gotowe zapytania do raport�
 - niezmienne pliki Bronze JSON oraz manifest z zapytaniem, czasem i SHA-256;
 - tabela wersji ogłoszeń, historia przebiegów i kwarantanna błędnych rekordów;
 - deterministyczne klucze i UPSERT, żeby ponowne uruchomienie nie tworzyło kopii;
-- modele dbt dla szans IT, zamawiających, aktywności oraz dostępności danych o wynikach;
+- modele dbt dla szans IT, terminów, zamawiających, zmian źródłowych i pokrycia danych;
 - harmonogram Airflow, lokalne środowisko Docker Compose i konfiguracja Metabase;
 - dokumentacja architektury, modelu danych, obsługi, źródeł i przygotowania do rozmowy.
 
@@ -26,15 +26,16 @@ uruchamia codzienny przyrost, a Metabase udostępnia gotowe zapytania do raport�
     Airflow: harmonogram -> Python -> dbt: modele analityczne -> Metabase: raporty
 
 Przebieg zapisuje każdą odebraną stronę **przed parsowaniem**. Błąd parsera trafia do
-rejected_records, a źródłowy JSON pozostaje w Bronze. Zmiana parsera nie wymaga
-ponownego odpytywania TED. W razie przerwania pobrania przebieg otrzymuje status
-failed; rozpoczęte strony pozostają dostępne do audytu.
+rejected_records, a źródłowy JSON pozostaje w Bronze. Archiwum umożliwia przyszłe
+ponowne parsowanie, ale wersja 0.1 nie udostępnia jeszcze polecenia reprocess. W razie
+przerwania pobrania przebieg otrzymuje status failed; rozpoczęte strony pozostają
+dostępne do audytu.
 
 ## Uruchomienie lokalne
 
-Wymagane są Docker Desktop z Compose v2 oraz dostęp do Internetu. W PowerShell:
+Wymagane są Docker Desktop z Compose v2 oraz dostęp do Internetu. W PowerShell,
+uruchomionym w katalogu repozytorium:
 
-    Set-Location outputs/ProcureScope
     Copy-Item .env.example .env
 
 Zmień hasła w .env przed startem. Po zmianie hasła PostgreSQL zaktualizuj
@@ -56,10 +57,12 @@ Interfejsy lokalne:
 | MinIO Console | http://localhost:9001 | wartości MINIO_ROOT_USER i MINIO_ROOT_PASSWORD |
 | PostgreSQL | localhost:5432 | baza procurescope |
 
-W Airflow włącz DAG procurescope_daily, aby uruchomić harmonogram. Jednorazowy
-backfill można wykonać bez czekania na scheduler:
+W Airflow włącz DAG procurescope_daily, aby uruchomić harmonogram. Krótki import
+demonstracyjny można wykonać bez czekania na scheduler:
 
-    docker compose --profile manual run --rm ingest python -m procurescope.cli ingest --days 548
+    docker compose --profile manual run --rm ingest python -m procurescope.cli ingest --days 7
+
+Pełny backfill około 18 miesięcy uruchom z `--days 548`.
 
 Po pobraniu i zapisaniu danych zbuduj modele:
 
@@ -67,7 +70,7 @@ Po pobraniu i zapisaniu danych zbuduj modele:
 
 Polecenie może pobrać duży zakres z TED. Krótszy, jawny zakres do pierwszego przebiegu:
 
-    docker compose --profile manual run --rm ingest python -m procurescope.cli ingest --from-date 2026-10-01 --to-date 2026-10-14
+    docker compose --profile manual run --rm ingest python -m procurescope.cli ingest --days 14
 
 Daty są włączne. API TED udostępnia publiczne wyszukiwanie bez klucza API. Repozytorium
 nie zawiera tokenów ani skopiowanych zbiorów TED.
@@ -82,9 +85,10 @@ Podczas konfiguracji Metabase dodaj bazę PostgreSQL:
 - użytkownik i hasło: z .env
 - schemat: analytics (modele dbt) lub public (tabele źródłowe)
 
-Gotowe zapytania do dashboardu znajdują się w metabase/questions.sql. Możesz je wkleić
-jako pytania SQL i ułożyć w dashboard: „Otwarte terminy”, „Aktywność zamawiających”
-oraz „Pokrycie danych”.
+Gotowe zapytania znajdują się w metabase/questions.sql. Zapisz je w Metabase jako
+pytania SQL i dodaj do dashboardu: „Terminy”, „Aktywność zamawiających”, „Zmiany w TED”,
+„Pokrycie danych” i „Dostępne wyniki”. Repozytorium udostępnia zapytania i modele,
+ale nie automatycznie utworzony dashboard Metabase.
 
 ## Polecenia developerskie
 
@@ -97,7 +101,7 @@ PostgreSQL/MinIO w środowisku:
     $env:DATABASE_URL = "postgresql://procurescope:haslo@localhost:5432/procurescope"
     $env:STORAGE_BACKEND = "local"
     procurescope init-db
-    procurescope ingest --from-date 2026-10-01 --to-date 2026-10-14
+    procurescope ingest --days 14
 
 Quality gate w GitHub Actions uruchamia Ruff i sprawdza kompilację modułów Pythona.
 Kontrole danych dbt są opisane przy modelach; uruchamia je dbt build.
@@ -115,10 +119,17 @@ Kontrole danych dbt są opisane przy modelach; uruchamia je dbt build.
   poziomie części.
 - Różne waluty nie są przeliczane. Puste pola mogą być zgodne z typem ogłoszenia i
   nie są automatycznie usuwane.
+- Pola wielojęzyczne są wybierane w kolejności polski, angielski, a potem pozostałe
+  języki. Jeśli TED zwróci wiele różnych terminów dla części, kolumna `deadline`
+  przechowuje najwcześniejszy dostępny dzień; pełne dane pozostają w `source_payload`.
+- `last_seen_at` oznacza ponowne pobranie rekordu, a `source_changed_at` zmianę treści
+  zwróconej przez TED. Samo odświeżenie identycznego ogłoszenia nie zmienia
+  `source_changed_at`.
 - TED zawiera formularze eForms i starsze formularze. Parser przyjmuje niejednorodne
-  wartości, ale Silver zachowuje pełny rekord źródłowy, by umożliwić ponowną analizę.
-- Okno przyrostu i ponownego sprawdzenia można zmienić przez przekazanie zakresu
-  dat; dzienny DAG ponownie pobiera ostatnie 14 dni.
+  wartości, a Silver zachowuje pełny rekord źródłowy. Wersja 0.1 nie ma jeszcze
+  polecenia do ponownego parsowania istniejącego Bronze bez pobrania z API.
+- Okno przyrostu można zmienić przez przekazanie zakresu dat; dzienny DAG pobiera
+  bieżący dzień i 14 poprzednich dni.
 - Połączenie zamawiających po nazwie nie jest tożsamością prawną. Raporty grupują
   po nazwie i kraju wyłącznie dla wygody.
 

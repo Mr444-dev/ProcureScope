@@ -24,6 +24,16 @@ models:
         tests:
           - accepted_values:
               values: ["unknown", "deadline_passed", "deadline_open"]
+      - name: source_changed_at
+        description: "Czas ostatniej zmiany treści w odpowiedzi TED; ponowne pobranie bez zmian go nie przesuwa."
+
+  - name: mart_upcoming_deadlines
+    description: "Ogłoszenia IT z terminem dziś lub w przyszłości. Deadline jest wskaźnikiem terminu, a nie pełnym statusem postępowania."
+    columns:
+      - name: notice_key
+        description: "Klucz wersji ogłoszenia z tabeli faktów."
+      - name: days_until_deadline
+        description: "Liczba dni między datą dzisiejszą bazy a terminem składania ofert."
 
   - name: dim_buyer
     description: "Raportowy wymiar po nazwie i kraju; nazwa nie jest prawnym ID."

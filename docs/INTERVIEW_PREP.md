@@ -18,7 +18,8 @@ inżynierii danych; nie przypisuj mu wdrożonych oszczędności ani wpływu na u
 12. Co przy błędzie API? Retry dla błędów przejściowych; run nie dostaje statusu sukcesu.
 13. Jak ponawiasz zakres? Powtarzam daty; nowe pliki Bronze, idempotentny upsert w Silver.
 14. Jak działa przyrost? Dzienny zakres z nakładką 14 dni na opóźnienia i korekty.
-15. Czy raw można przetworzyć ponownie? Tak; CLI reprocess jest kolejnym krokiem.
+15. Czy raw można przetworzyć ponownie? Bronze zachowuje oryginalne strony, ale CLI
+    reprocess nie jest jeszcze zaimplementowany. Powtórny ingest ponownie odpytuje TED.
 16. Co oznacza rekord? Zaobserwowaną wersję ogłoszenia, nie całe postępowanie.
 17. Numer publikacji to ID? Nie zakładam; trzymam publication-number i notice-identifier.
 18. Jak wygląda historia? Identyfikator i wersja budują klucz; kolejne obserwacje

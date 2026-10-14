@@ -31,8 +31,8 @@ def procurescope_daily():
     def ingest(**context) -> dict:
         from procurescope.pipeline import run_pipeline
 
-        start = context["data_interval_start"].subtract(days=14).date()
         end = context["data_interval_end"].date()
+        start = end - timedelta(days=14)
         result = run_pipeline(start, end)
         LOGGER.info("Ingestion summary: %s", result)
         return result

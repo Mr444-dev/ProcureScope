@@ -25,6 +25,9 @@ select
     end as deadline_status,
     award_fields <> '{}'::jsonb as has_award_fields,
     ingestion_run_id,
+    first_seen_at,
+    last_seen_at,
+    source_changed_at,
     updated_at
 from notices
 where exists (

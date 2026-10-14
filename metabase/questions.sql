@@ -1,8 +1,8 @@
--- 1. Otwarte terminy w najbliższych 30 dniach.
-select publication_number, title, buyer_name, buyer_country, deadline, cpv_codes, notice_url
-from analytics.fct_it_opportunities
-where deadline >= current_date
-  and deadline < current_date + interval '30 days'
+-- 1. Terminy dziś lub w ciągu najbliższych 30 dni.
+select publication_number, title, buyer_name, buyer_country, deadline,
+       days_until_deadline, cpv_codes, notice_url
+from analytics.mart_upcoming_deadlines
+where days_until_deadline between 0 and 30
 order by deadline asc;
 
 -- 2. Aktywność zamawiających według miesiąca; nazwa nie jest prawnym ID.
@@ -18,7 +18,15 @@ select publication_number, buyer_name, publication_date, award_fields, notice_ur
 from analytics.mart_award_notice_coverage
 order by publication_date desc;
 
--- 5. Ostatnie przebiegi pipeline'u.
+-- 5. Treść źródłowa dodana lub zmieniona w TED w ostatnich 30 dniach.
+-- source_changed_at nie zmienia się przy samym ponownym pobraniu tej samej treści.
+select publication_number, title, buyer_name, publication_date,
+       source_changed_at, notice_url
+from analytics.fct_it_opportunities
+where source_changed_at >= now() - interval '30 days'
+order by source_changed_at desc;
+
+-- 6. Ostatnie przebiegi pipeline'u.
 select run_id, status, started_at, finished_at, page_count,
        received_count, loaded_count, rejected_count, error_message
 from public.ingestion_runs

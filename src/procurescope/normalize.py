@@ -7,6 +7,8 @@ from datetime import date, datetime
 from typing import Any
 from urllib.parse import quote
 
+LANGUAGE_PRIORITY = ("pol", "eng", "pl", "en")
+
 
 def _normal_key(value: str) -> str:
     return re.sub(r"[^a-z0-9]", "", value.lower())
@@ -27,7 +29,7 @@ def _flatten_text(value: Any) -> str | None:
         result = str(value).strip()
         return result or None
     if isinstance(value, list):
-        values = [_flatten_text(item) for item in value]
+        values = dict.fromkeys(_flatten_text(item) for item in value)
         return "; ".join(item for item in values if item) or None
     if isinstance(value, dict):
         for key in ("value", "text", "name", "label", "code", "id"):
@@ -35,6 +37,15 @@ def _flatten_text(value: Any) -> str | None:
                 result = _flatten_text(value[key])
                 if result:
                     return result
+        normalized = {str(key).lower(): item for key, item in value.items()}
+        for language in LANGUAGE_PRIORITY:
+            result = _flatten_text(normalized.get(language))
+            if result:
+                return result
+        for key in sorted(value, key=lambda item: str(item).casefold()):
+            result = _flatten_text(value[key])
+            if result:
+                return result
         return None
     return None
 
@@ -46,6 +57,9 @@ def _as_list(value: Any) -> list[Any]:
 
 
 def _parse_date(value: Any) -> date | None:
+    if isinstance(value, list):
+        parsed = [candidate for item in value if (candidate := _parse_date(item))]
+        return min(parsed) if parsed else None
     text = _flatten_text(value)
     if not text:
         return None
@@ -76,7 +90,9 @@ def _code_values(value: Any) -> list[str]:
 
 def _places(value: Any) -> list[dict[str, Any]]:
     places: list[dict[str, Any]] = []
+    seen: set[str] = set()
     for item in _as_list(value):
+        place: dict[str, Any] | None = None
         if isinstance(item, dict):
             place = {
                 "country": _flatten_text(
@@ -102,11 +118,16 @@ def _places(value: Any) -> list[dict[str, Any]]:
                     _lookup(item, "description", "region", "other")
                 ),
             }
-            places.append({key: val for key, val in place.items() if val})
+            place = {key: val for key, val in place.items() if val}
         else:
             text = _flatten_text(item)
             if text:
-                places.append({"code_or_text": text})
+                place = {"code_or_text": text}
+        if place:
+            signature = json.dumps(place, ensure_ascii=False, sort_keys=True)
+            if signature not in seen:
+                places.append(place)
+                seen.add(signature)
     return places
 
 

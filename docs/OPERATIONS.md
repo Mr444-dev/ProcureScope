@@ -3,8 +3,8 @@
 ## Przebieg codzienny
 
 Airflow planuje DAG na 10:30 w strefie Europe/Warsaw, po zwykłej porze publikacji
-dziennego pakietu TED. Każde uruchomienie pobiera bieżący dzień oraz nakładające się
-14 dni. Zakres można zmienić w DAG-u lub uruchomić z CLI.
+dziennego pakietu TED. Każde uruchomienie pobiera bieżący dzień i 14 poprzednich dni.
+Zakres można zmienić w DAG-u lub uruchomić z CLI.
 
 Task ma retry z przerwą, limit czasu i jawne logi. API Search jest publiczne, dlatego
 klucz API nie jest wymagany. Retry nie zastępuje idempotentnego upsertu.
@@ -31,8 +31,10 @@ klucz API nie jest wymagany. Retry nie zastępuje idempotentnego upsertu.
 
 - Błąd API pozostawia już odebrane pliki w Bronze i oznacza run jako failed.
 - Powtórz zakres z tymi samymi datami. Upsert zachowa jeden wiersz na klucz i wersję.
-- Jeżeli zmienił się parser, zbuduj osobne zadanie reprocess odczytujące JSON z Bronze.
-  Reprocess nie jest jeszcze osobnym poleceniem CLI w wersji 0.1.
+- `last_seen_at` pokaże ponowne pobranie, a `source_changed_at` zmieni się tylko, gdy
+  TED zwróci inną treść.
+- Bronze przechowuje źródłowe strony, ale wersja 0.1 nie ma polecenia reprocess.
+  Powtórny ingest ponownie odpytuje TED; parser-only reprocessing pozostaje do dodania.
 - Błędy połączenia z MinIO/PostgreSQL należy sprawdzić przed zwiększeniem retry.
   Nie kasuj partycji Bronze po nieudanym runie.
 

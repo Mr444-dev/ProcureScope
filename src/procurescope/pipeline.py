@@ -58,7 +58,7 @@ def run_pipeline(
     try:
         for page in client.iter_pages(query, TED_FIELDS):
             page_count += 1
-            received = page.payload.get("notices", [])
+            received = page.payload.get("notices")
             if not isinstance(received, list):
                 raise ValueError(f"TED response page {page.page_number} has no notice list")
             received_count += len(received)
@@ -106,6 +106,11 @@ def run_pipeline(
             database.reject_records(run_id, page.page_number, rejected_page)
             loaded_count += len(normalized_page)
             rejected_count += len(rejected_page)
+
+        if received_count != loaded_count + rejected_count:
+            raise RuntimeError(
+                "Ingestion count mismatch: received records must equal loaded plus rejected"
+            )
 
         database.finish_run(
             run_id,

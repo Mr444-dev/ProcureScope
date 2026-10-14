@@ -44,8 +44,19 @@ CREATE TABLE IF NOT EXISTS source_notice_versions (
     ingestion_run_id UUID REFERENCES ingestion_runs(run_id),
     first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    source_changed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE source_notice_versions
+    ADD COLUMN IF NOT EXISTS source_changed_at TIMESTAMPTZ;
+UPDATE source_notice_versions
+SET source_changed_at = first_seen_at
+WHERE source_changed_at IS NULL;
+ALTER TABLE source_notice_versions
+    ALTER COLUMN source_changed_at SET DEFAULT now();
+ALTER TABLE source_notice_versions
+    ALTER COLUMN source_changed_at SET NOT NULL;
 
 CREATE INDEX IF NOT EXISTS ix_notice_publication_date
     ON source_notice_versions (publication_date);
@@ -72,11 +83,11 @@ INSERT INTO source_notice_versions (
     publication_date, title, buyer_name, buyer_country, deadline,
     cpv_codes, performance_locations, procedure_identifier, form_type,
     notice_url, award_fields, source_hash, source_payload,
-    ingestion_run_id, first_seen_at, last_seen_at, updated_at
+    ingestion_run_id, first_seen_at, last_seen_at, source_changed_at, updated_at
 ) VALUES (
     %s, %s, %s, %s, %s, %s, %s, %s, %s,
     %s, %s, %s, %s, %s, %s, %s, %s,
-    %s, now(), now(), now()
+    %s, now(), now(), now(), now()
 )
 ON CONFLICT (notice_key) DO UPDATE SET
     publication_number = EXCLUDED.publication_number,
@@ -97,6 +108,11 @@ ON CONFLICT (notice_key) DO UPDATE SET
     source_payload = EXCLUDED.source_payload,
     ingestion_run_id = EXCLUDED.ingestion_run_id,
     last_seen_at = now(),
+    source_changed_at = CASE
+        WHEN source_notice_versions.source_hash IS DISTINCT FROM EXCLUDED.source_hash
+        THEN now()
+        ELSE source_notice_versions.source_changed_at
+    END,
     updated_at = now()
 """
 

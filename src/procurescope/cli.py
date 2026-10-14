@@ -24,7 +24,7 @@ def _parser() -> argparse.ArgumentParser:
         "--days",
         type=int,
         default=None,
-        help="Look back this many days when --from-date is omitted.",
+        help="Load this many inclusive calendar days when --from-date is omitted.",
     )
     subparsers.add_parser("init-db", help="Create the database tables.")
     return parser
@@ -44,12 +44,27 @@ def main() -> None:
         print("ProcureScope schema is ready.")
         return
 
+    if args.days is not None and args.days < 1:
+        parser.error("--days must be a positive number")
+    if args.from_date and args.days is not None:
+        parser.error("--days cannot be combined with --from-date")
+
     today = date.today()
-    end_date = args.to_date or today
-    days = args.days if args.days is not None else int(os.getenv("TED_DAYS_BACKFILL", "548"))
-    start_date = args.from_date or (end_date - timedelta(days=days))
-    if args.from_date and not args.to_date:
-        end_date = today
+    if args.from_date:
+        start_date = args.from_date
+        end_date = args.to_date or today
+    else:
+        end_date = args.to_date or today
+        days = args.days if args.days is not None else int(
+            os.getenv("TED_DAYS_BACKFILL", "548")
+        )
+        if days < 1:
+            parser.error("TED_DAYS_BACKFILL must be a positive number")
+        start_date = end_date - timedelta(days=days - 1)
+
+    if start_date > end_date:
+        parser.error("--from-date must be on or before --to-date")
+
     report = run_pipeline(start_date, end_date, settings)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

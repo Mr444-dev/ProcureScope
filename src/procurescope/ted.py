@@ -19,6 +19,7 @@ class SearchPage:
     body: bytes
     payload: dict
     iteration_next_token: str | None
+    timed_out: bool
 
 
 class TedSearchClient:
@@ -87,6 +88,7 @@ class TedSearchClient:
                 raise ValueError(f"TED response on page {page_number} was not an object")
 
             next_token = payload.get("iterationNextToken")
+            timed_out = payload.get("timedOut") is True
             if next_token and next_token in seen_tokens:
                 raise RuntimeError("TED repeated an iteration token; stopping to avoid a loop")
             if next_token:
@@ -97,7 +99,12 @@ class TedSearchClient:
                 body=response.content,
                 payload=payload,
                 iteration_next_token=next_token,
+                timed_out=timed_out,
             )
+            if timed_out:
+                raise RuntimeError(
+                    f"TED search timed out on page {page_number}; the query may be incomplete"
+                )
             if not next_token:
                 break
             token = next_token
