@@ -128,7 +128,7 @@ def normalize_notice(record: dict[str, Any]) -> dict[str, Any]:
     # deterministic for a notice/version so repeated pulls are idempotent.
     version_identity = version or (publication_date.isoformat() if publication_date else "")
     notice_key = hashlib.sha256(
-        f"{identity}|{version_identity}".encode("utf-8")
+        f"{identity}|{version_identity}".encode()
     ).hexdigest()
 
     title = _flatten_text(

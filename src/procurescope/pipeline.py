@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import uuid4
 
 from procurescope.config import Settings
@@ -63,7 +63,7 @@ def run_pipeline(
                 raise ValueError(f"TED response page {page.page_number} has no notice list")
             received_count += len(received)
             checksum = hashlib.sha256(page.body).hexdigest()
-            stamp = datetime.now(timezone.utc)
+            stamp = datetime.now(UTC)
             raw_key = (
                 f"ted/publication_date={stamp.date().isoformat()}/"
                 f"run_id={run_id}/page_{page.page_number:04d}.json"

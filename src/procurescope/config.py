@@ -19,7 +19,7 @@ class Settings:
     s3_bucket: str
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         return cls(
             api_url=os.getenv(
                 "TED_API_URL", "https://api.ted.europa.eu/v3/notices/search"

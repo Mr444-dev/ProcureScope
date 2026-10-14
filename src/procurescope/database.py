@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import UUID
 
 import psycopg
@@ -117,7 +117,7 @@ class Database:
                     (run_id, query_text, window_start, window_end, started_at, status)
                 VALUES (%s, %s, %s, %s, %s, 'running')
                 """,
-                (run_id, query, start, end, datetime.now(timezone.utc)),
+                (run_id, query, start, end, datetime.now(UTC)),
             )
 
     def upsert_notices(self, notices: list[dict], run_id: UUID) -> None:
@@ -190,7 +190,7 @@ class Database:
                 WHERE run_id = %s
                 """,
                 (
-                    datetime.now(timezone.utc),
+                    datetime.now(UTC),
                     status,
                     page_count,
                     received_count,
