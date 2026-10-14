@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_source_notices
+    description: "Warstwa staging, jedno źródłowe ogłoszenie/wydanie na wiersz."
+    columns:
+      - name: notice_key
+        description: "Lokalny klucz z identyfikatora źródłowego i wersji."
+        tests:
+          - not_null
+          - unique
+      - name: source_hash
+        tests:
+          - not_null
+
+  - name: fct_it_opportunities
+    description: "Wersje ogłoszeń z co najmniej jednym kodem CPV z rodziny 72."
+    columns:
+      - name: notice_key
+        tests:
+          - not_null
+          - unique
+      - name: deadline_status
+        tests:
+          - accepted_values:
+              values: ["unknown", "deadline_passed", "deadline_open"]
+
+  - name: dim_buyer
+    description: "Raportowy wymiar po nazwie i kraju; nazwa nie jest prawnym ID."
+    columns:
+      - name: buyer_key
+        tests:
+          - not_null
+          - unique
+
+  - name: mart_buyer_activity
+    description: "Miesięczna liczba obserwowanych wersji ogłoszeń według zamawiającego."
+    columns:
+      - name: month
+        tests:
+          - not_null
+      - name: notice_versions
+        tests:
+          - not_null

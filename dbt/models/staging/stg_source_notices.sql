@@ -1,0 +1,22 @@
+select
+    notice_key,
+    publication_number,
+    notice_identifier,
+    notice_version,
+    publication_date,
+    title,
+    buyer_name,
+    buyer_country,
+    deadline,
+    cpv_codes,
+    performance_locations,
+    procedure_identifier,
+    form_type,
+    notice_url,
+    award_fields,
+    source_hash,
+    ingestion_run_id,
+    first_seen_at,
+    last_seen_at,
+    updated_at
+from {{ source('procurescope', 'source_notice_versions') }}

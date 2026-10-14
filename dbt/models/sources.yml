@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: procurescope
+    schema: public
+    tables:
+      - name: source_notice_versions
+        description: "Jeden wiersz na zaobserwowaną wersję ogłoszenia z TED."
+      - name: ingestion_runs
+        description: "Rejestr przebiegów pobierania TED."

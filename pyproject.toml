@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "procurescope"
+version = "0.1.0"
+description = "An incremental data warehouse for Polish IT procurement notices published on TED."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dependencies = [
+  "requests>=2.31,<3",
+  "psycopg[binary]>=3.2,<4",
+  "boto3>=1.35,<2",
+]
+
+[project.scripts]
+procurescope = "procurescope.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

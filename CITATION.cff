@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use ProcureScope, cite the repository and the TED data source."
+title: "ProcureScope"
+type: software
+authors:
+  - family-names: "Rusinek"
+    given-names: "Michał"
+    affiliation: "ProcureScope contributors"
+version: 0.1.0
+date-released: 2026-10-14
+license: MIT
+repository-code: "https://github.com/Mr444-dev/ProcureScope"
+url: "https://ted.europa.eu/"

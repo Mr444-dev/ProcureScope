@@ -1,0 +1,13 @@
+ProcureScope code is licensed under the MIT License. This notice does not apply
+to external services, third-party software, or data retrieved from TED.
+
+Data source: Tenders Electronic Daily (TED), Publications Office of the
+European Union, https://ted.europa.eu/
+
+TED notices are retrieved at runtime from the public TED Search API. No TED
+dataset is bundled with this repository. When reusing TED data, retain source
+attribution and check the current TED reuse terms:
+https://docs.ted.europa.eu/ODS/latest/reuse/index.html
+
+Third-party components remain under their respective licenses:
+Python, PostgreSQL, MinIO, Apache Airflow, dbt Core, and Metabase.
