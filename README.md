@@ -1,5 +1,7 @@
 # ProcureScope
 
+![ProcureScope architecture snapshot: TED Search API, Python ingestion, MinIO Bronze, PostgreSQL, dbt and Metabase query layer. Generated from repository documentation; no live procurement counts or dashboard are shown.](docs/screenshots/procurescope-analytics-showcase.png)
+
 **Hurtownia danych o publicznych przetargach IT z miejscem realizacji w Polsce.**
 ProcureScope pobiera ogłoszenia z TED, archiwizuje niezmienioną odpowiedź API, zapisuje
 uporządkowane rekordy w PostgreSQL i buduje modele analityczne przez dbt. Airflow
