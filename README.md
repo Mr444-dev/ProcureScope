@@ -150,8 +150,8 @@ wdrożeniem.
 - [Klasyfikacja CPV](https://docs.ted.europa.eu/eforms/latest/reference/code-lists/cpv.html)
 - [Ponowne wykorzystanie danych TED](https://docs.ted.europa.eu/ODS/latest/reuse/index.html)
 
-Kod projektu jest udostępniony na licencji MIT. Licencja kodu nie zmienia warunków,
-na których udostępniane są dane zewnętrzne. Zobacz NOTICE.
+Oryginalny kod ProcureScope autorstwa Michała Rusinka (Mr444-dev) jest udostępniony na licencji MIT (zobacz [LICENSE](LICENSE)). Licencja kodu nie zmienia warunków,
+na których udostępniane są dane zewnętrzne. Zobacz [NOTICE](NOTICE).
 
 ## Współtworzenie
 
