@@ -150,8 +150,7 @@ wdrożeniem.
 - [Klasyfikacja CPV](https://docs.ted.europa.eu/eforms/latest/reference/code-lists/cpv.html)
 - [Ponowne wykorzystanie danych TED](https://docs.ted.europa.eu/ODS/latest/reuse/index.html)
 
-Oryginalny kod ProcureScope autorstwa Michała Rusinka (Mr444-dev) jest udostępniony na licencji MIT (zobacz [LICENSE](LICENSE)). Licencja kodu nie zmienia warunków,
-na których udostępniane są dane zewnętrzne. Zobacz [NOTICE](NOTICE).
+Oryginalny kod i dokumentacja ProcureScope autorstwa Michała Rusinka (Mr444-dev) są chronione prawem autorskim; wszystkie prawa zastrzeżone. Nie udzielam licencji na dalsze kopiowanie, modyfikowanie, rozpowszechnianie ani komercyjne użycie. Dane TED i inne materiały zewnętrzne podlegają odrębnym warunkom — zobacz [NOTICE](NOTICE) oraz [LICENSE](LICENSE).
 
 ## Współtworzenie
 
