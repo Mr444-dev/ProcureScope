@@ -54,7 +54,7 @@ inżynierii danych; nie przypisuj mu wdrożonych oszczędności ani wpływu na u
 46. Co po błędzie strony 4? Strony 1–3 są w Bronze, run jest failed, można powtórzyć zakres.
 47. Jak mierzysz świeżość? Czas ostatniego sukcesu i publication_date.
 48. Jak odtworzyć projekt? Docker Compose, .env.example i polecenia z README.
-49. Jak chronisz sekrety/licencję? .env jest ignorowane, MIT dotyczy kodu, TED ma własne warunki.
+49. Jak chronisz sekrety/licencję? .env jest ignorowane, kod nie jest objęty licencją otwartą, a TED ma własne warunki.
 50. Jakie ograniczenia wskażesz? Brak heurystycznego łączenia, walut i dowiedzionego ROI.
 
 ## Demo na żywo
